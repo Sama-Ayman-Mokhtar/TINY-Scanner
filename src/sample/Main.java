@@ -25,32 +25,20 @@ public class Main extends Application {
     private GridPane bottomGP = new GridPane();
     private ScrollPane sp = getSp();
     private ScrollPane spBottom = getSpBottom();
+    private TextArea ta;
 
-    @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-
-        bp = new BorderPane();
-
+    private HBox getTopPane() {
         HBox topi = new HBox();
-        Label inst = new Label("Please, Delete The TINY Code Below, Paste Yours, Then click Continue");
+        Label inst = new Label("Scanner: Tokens and Token Type of Input Code");
         inst.setStyle("-fx-font-size: 16pt;");
         topi.getChildren().addAll(inst);
         topi.setSpacing(20);
         topi.setAlignment(Pos.CENTER);
         topi.setPadding(new Insets(20,20,20,20));
-        bp.setTop(topi);
-
-        VBox bv = new VBox();
-        Button cont = new Button("Continue");
-        cont.setStyle("-fx-font-size: 16pt");
-        bv.getChildren().add(cont);
-        bv.setAlignment(Pos.CENTER);
-        bv.setPadding(new Insets(20,20,20,20));
-        //cont.setOnAction(e -> nextAction());
-        bp.setBottom(bv);
-
-        TextArea ta = new TextArea();
+        return topi;
+    }
+    private TextArea getCentrePane(){
+        ta = new TextArea();
         ta.setText("{ Sample program in TINY-language computes factorial }\n" +
                 "read x; { input an integer }\n" +
                 "if 0 < x then { don't compute if x <= 0 }\n" +
@@ -61,77 +49,79 @@ public class Main extends Application {
                 "    until x = 0;\n" +
                 "    write fact { output factorial of x }\n" +
                 "end");
-        //ta.setFont(Font.font("Verdana", FontWeight.BOLD, 70));
-        ta.setFont(Font.font(16));
-      //  ta.setPadding(new Insets(50));
-        bp.setCenter(ta);
-        cont.setOnAction(e-> {
-            FileWriter.writeFile(ta.getText());
-            FileReader.openFile();
-            FileReader.getTokens();
-           // FileReader.printTokens();
-            FileReader.closeFile();
-            fillRightGP();
-            fillTop();
-            fillBottomGP();
-           // bp.setRight();
-            bp.setRight(sp);
-            bp.setBottom(spBottom);
-            /*addRowMiddleGP(0,0);
-            middleGP.setVgap(10);
-            middleGP.setHgap(10);
-            middleGP.setPadding(new Insets(20,20,20,20));
-            //middleGP.setGridLinesVisible(true);
-            getLeftVBox();
-            bp.setRight(leftVBox);
-            bp.setCenter(sp);
-            bp.setBottom(getBottomVBox("Next Instruction"));
-            bp.setTop(getTopHBox("Click 'Next Instruction' to Start"));
-            Controller.setlineCount();*/
-            //System.out.println(Controller.InstHashMap);
-            // Register.s0.setValue(Tool.decimaltoTwosComplement("10"));
-            //Register.s1.setValue(Tool.decimaltoTwosComplement("12"));
-            // Register.s2.setValue(Tool.decimaltoTwosComplement("32"));
-            //Register.s5.setValue(Tool.decimaltoTwosComplement("500"));
 
-        });
+        ta.setFont(Font.font(16));
+        return ta;
+    }
+
+    private ScrollPane getSpBottom(){
+        ScrollPane sp = new ScrollPane();
+        sp.setContent(bottomGP);
+        sp.setPrefViewportHeight(150);
+        sp.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+        sp.setHbarPolicy(ScrollBarPolicy.ALWAYS);
+        sp.setPannable(true);
+        return  sp;
+    }
+
+    private VBox bottomPane() {
+        VBox bv = new VBox();
+        Button cont = new Button("     Run     ");
+        cont.setStyle("-fx-font-size: 16pt");
+        bv.getChildren().add(getSpBottom());
+        bv.getChildren().add(cont);
+        bv.setAlignment(Pos.CENTER);
+        //setPadding(new Insets(20,20,20,20));
+
+        cont.setOnAction(e->runOnAction());
+
+        return bv;
+    }
+
+    private void runOnAction(){
+        FileWriter.writeFile(ta.getText());
+        FileReader.openFile();
+        FileReader.getTokens();
+        FileReader.closeFile();
+
+        fillRightGP();
+        bp.setRight(sp);
+        fillBottomGP();
+        bp.setBottom(bottomPane());
+    }
+
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+
+        bp = new BorderPane();
+        bp.setTop(getTopPane());
+        bp.setCenter(getCentrePane());
+        fillBottomGP();
+        bp.setBottom(bottomPane());
+        fillRightGP();
+        bp.setRight(sp);
+
+
         Scene scene = new Scene(bp, 900, 600);
         primaryStage.setTitle("Scanner");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
     private ScrollPane getSp(){
         ScrollPane sp = new ScrollPane();
         sp.setContent(rightGP);
         sp.setVbarPolicy(ScrollBarPolicy.ALWAYS);
         sp.setHbarPolicy(ScrollBarPolicy.ALWAYS);
-        //sp.setFitToWidth(true);
         sp.setPannable(true);
-        return  sp;
+        return sp;
     }
-    private ScrollPane getSpBottom(){
-        ScrollPane sp = new ScrollPane();
-        sp.setContent(bottomGP);
-        //sp.setPrefSize(1920, 1080);
-       // sp.setPrefViewportWidth(100);
-        sp.setPrefViewportHeight(150);
-        sp.setVbarPolicy(ScrollBarPolicy.ALWAYS);
-        sp.setHbarPolicy(ScrollBarPolicy.ALWAYS);
-        //sp.setFitToWidth(true);
-        sp.setPannable(true);
-        return  sp;
-    }
-    private void fillTop(){
-        HBox topi = new HBox();
-        Label inst = new Label("Scanner: Tokens and Token Type of Input Code");
-        inst.setStyle("-fx-font-size: 16pt;");
-        topi.getChildren().addAll(inst);
-        topi.setSpacing(20);
-        topi.setAlignment(Pos.CENTER);
-        topi.setPadding(new Insets(20,20,20,20));
-        bp.setTop(topi);
-    }
+
     private void fillRightGP(){
+        // rightGP = new GridPane();
+        rightGP.getChildren().clear();
         rightGP.setVgap(5);
         rightGP.setHgap(30);
         rightGP.setPadding(new Insets(10,40,40,40));
@@ -165,6 +155,7 @@ public class Main extends Application {
 
     }
     private void fillBottomGP(){
+        bottomGP.getChildren().clear();
         bottomGP.setVgap(5);
         bottomGP.setHgap(30);
         bottomGP.setPadding(new Insets(10,40,40,40));

@@ -34,6 +34,8 @@ public class FileReader {
         }
     }
     static void getTokens(){
+        Tokens = new ArrayList<Token>();
+        unrecognizedTokens = new ArrayList<ErrorElement>();
         int lineCount = 0;
         while(scan.hasNext()){
             lineCount++;
